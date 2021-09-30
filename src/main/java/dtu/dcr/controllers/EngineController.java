@@ -48,6 +48,12 @@ public class EngineController {
 		return (ResponseEntity<String>) ResponseEntity.notFound();
 	}
 
+	@GetMapping("/simulation/{id}/reset")
+	public ResponseEntity<String> reset(@PathVariable String id) {
+		models.remove(id);
+		return ResponseEntity.ok("ack");
+	}
+
 	@SuppressWarnings("unchecked")
 	@GetMapping("/simulation/{id}/execute/{activity}")
 	public ResponseEntity<String> status(@PathVariable String id, @PathVariable String activity) {

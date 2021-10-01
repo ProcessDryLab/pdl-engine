@@ -38,12 +38,8 @@ public class EngineController {
 	@GetMapping("/simulation/{id}/status")
 	public ResponseEntity<String> status(@PathVariable String id) {
 		if (models.containsKey(id)) {
-			final Process p = models.get(id);
-			SimulationStatus toSerialize = new SimulationStatus();
-			toSerialize.enabledActivities = p.getEnabledActivities();
-			toSerialize.isAccepting = p.isAccepting();
 			Gson gson = new Gson();
-			return ResponseEntity.ok(gson.toJson(toSerialize));
+			return ResponseEntity.ok(gson.toJson(buildStatus(id)));
 		}
 		return (ResponseEntity<String>) ResponseEntity.notFound();
 	}
@@ -60,9 +56,18 @@ public class EngineController {
 		if (models.containsKey(id)) {
 			Process p = models.get(id);
 			p.execute(p.getActivity(activity));
-			return ResponseEntity.ok("ack");
+			Gson gson = new Gson();
+			return ResponseEntity.ok(gson.toJson(buildStatus(id)));
 		}
 		return (ResponseEntity<String>) ResponseEntity.notFound();
+	}
+
+	public SimulationStatus buildStatus(String id) {
+		Process p = models.get(id);
+		SimulationStatus toSerialize = new SimulationStatus();
+		toSerialize.enabledActivities = p.getEnabledActivities();
+		toSerialize.isAccepting = p.isAccepting();
+		return toSerialize;
 	}
 }
 

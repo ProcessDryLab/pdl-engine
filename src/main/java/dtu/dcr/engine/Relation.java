@@ -6,7 +6,7 @@ import lombok.Getter;
 @EqualsAndHashCode
 public class Relation {
 
-	enum TYPES {
+	public enum TYPES {
 		CONDITION, RESPONSE, INCLUDE, EXCLUDE, MILESTONE
 	}
 

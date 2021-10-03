@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import beamline.dcr.view.DcrModelView;
 import dtu.dcr.engine.Process;
-import dtu.dcr.io.json.DCRJson;
 
 @RestController
 @RequestMapping("/api/v1/dcr/")
@@ -18,7 +17,7 @@ public class VisualizerController {
 
 	@PostMapping("/dcr2graphviz")
 	public ResponseEntity<String> visualize(@RequestBody String json) {
-		Process p = DCRJson.importFromJson(json);
+		Process p = Process.importFromJson(json);
 		DcrModelView view = new DcrModelView(p.exportToBeamlineModel());
 		return ResponseEntity.ok(view.toString());
 	}

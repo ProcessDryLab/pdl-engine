@@ -18,7 +18,6 @@ import com.google.gson.Gson;
 
 import dtu.dcr.engine.Activity;
 import dtu.dcr.engine.Process;
-import dtu.dcr.io.json.DCRJson;
 
 @RestController
 @RequestMapping("/api/v1/dcr/")
@@ -29,7 +28,7 @@ public class EngineController {
 
 	@PostMapping("/simulation/initialize")
 	public ResponseEntity<String> initialize(@RequestBody String json) {
-		Process p = DCRJson.importFromJson(json);
+		Process p = Process.importFromJson(json);
 		String id = UUID.randomUUID().toString();
 		models.put(id, p);
 		return ResponseEntity.ok(id);

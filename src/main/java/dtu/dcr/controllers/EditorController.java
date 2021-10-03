@@ -25,4 +25,10 @@ public class EditorController {
 		p.addRelation(new Activity(source), Relation.TYPES.valueOf(relation), new Activity(target));
 		return ResponseEntity.ok(new DCRJson(p).exportToJson());
 	}
+
+	@PostMapping("/importFromDcrJson")
+	public ResponseEntity<String> visualize(@RequestBody String json) {
+		Process p = DCRJson.importFromJson(json);
+		return ResponseEntity.ok(p.exportToJson());
+	}
 }

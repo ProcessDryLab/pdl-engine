@@ -9,6 +9,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import beamline.dcr.model.relations.DcrModel;
+import dtu.dcr.engine.Relation.TYPES;
 import lombok.Getter;
 
 public class Process {
@@ -21,8 +22,13 @@ public class Process {
 	private HashSet<Activity> included = new HashSet<Activity>();
 	private HashSet<Activity> pending = new HashSet<Activity>();
 
-	public void addActivity(String activityName) {
-		addActivity(new Activity(activityName, null));
+	public Activity addActivity(String activityName) {
+		Activity toRet = getActivity(activityName);
+		if (toRet == null) {
+			toRet = new Activity(activityName, null);
+			addActivity(toRet);
+		}
+		return toRet;
 	}
 
 	public void addActivity(String activityName, boolean isPending) {
@@ -48,6 +54,14 @@ public class Process {
 			}
 		}
 		return null;
+	}
+
+	public void addRelation(String source, String relation, String target) {
+		Activity srcActivity = addActivity(source);
+		Activity trtActivity = addActivity(target);
+		TYPES relationType = TYPES.valueOf(relation);
+		addRelation(srcActivity, relationType, trtActivity);
+
 	}
 
 	public void addRelation(Activity source, Relation.TYPES arr, Activity target) {

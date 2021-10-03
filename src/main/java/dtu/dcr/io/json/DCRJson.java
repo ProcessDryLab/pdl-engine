@@ -46,8 +46,9 @@ public class DCRJson {
 			p.addActivity(e.getLabel());
 		}
 		for (DCRJsonRule r : model.getRules()) {
-			p.addRelation(model.getEventFromId(r.getSource()).getActivity(), TYPES.valueOf(r.getType().toUpperCase()),
-					model.getEventFromId(r.getTarget()).getActivity());
+			Activity source = p.getActivity(model.getEventFromId(r.getSource()).getActivity().getName());
+			Activity target = p.getActivity(model.getEventFromId(r.getTarget()).getActivity().getName());
+			p.addRelation(source, TYPES.valueOf(r.getType().toUpperCase()), target);
 		}
 		return p;
 	}

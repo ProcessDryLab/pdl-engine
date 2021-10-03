@@ -8,9 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import dtu.dcr.engine.Activity;
 import dtu.dcr.engine.Process;
-import dtu.dcr.engine.Relation;
 import dtu.dcr.io.json.DCRJson;
 
 @RestController
@@ -21,14 +19,20 @@ public class EditorController {
 	@PostMapping("/edit/add/{source}/{relation}/{target}")
 	public ResponseEntity<String> visualize(@RequestBody String json, @PathVariable String source,
 			@PathVariable String relation, @PathVariable String target) {
-		Process p = DCRJson.importFromJson(json);
-		p.addRelation(new Activity(source), Relation.TYPES.valueOf(relation), new Activity(target));
-		return ResponseEntity.ok(new DCRJson(p).exportToJson());
+		Process p = Process.importFromJson(json);
+		p.addRelation(source, relation, target);
+		return ResponseEntity.ok(p.exportToJson());
 	}
 
 	@PostMapping("/importFromDcrJson")
-	public ResponseEntity<String> visualize(@RequestBody String json) {
+	public ResponseEntity<String> importFromDCRJson(@RequestBody String json) {
 		Process p = DCRJson.importFromJson(json);
 		return ResponseEntity.ok(p.exportToJson());
+	}
+
+	@PostMapping("/exportToDcrJson")
+	public ResponseEntity<String> exportToDCRJson(@RequestBody String json) {
+		Process p = Process.importFromJson(json);
+		return ResponseEntity.ok(new DCRJson(p).exportToJson());
 	}
 }

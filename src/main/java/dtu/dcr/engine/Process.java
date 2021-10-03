@@ -5,15 +5,15 @@ import java.util.Set;
 
 import org.apache.commons.lang3.tuple.Triple;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
 import beamline.dcr.model.relations.DcrModel;
+import lombok.Getter;
 
 public class Process {
 
+	@Getter
 	private HashSet<Activity> activities = new HashSet<Activity>();
 	private HashSet<Activity> executedActivities = new HashSet<Activity>();
+	@Getter
 	private HashSet<Relation> relations = new HashSet<Relation>();
 	private HashSet<Activity> included = new HashSet<Activity>();
 	private HashSet<Activity> pending = new HashSet<Activity>();
@@ -118,17 +118,5 @@ public class Process {
 					DcrModel.RELATION.valueOf(r.getRelation().toString())));
 		}
 		return m;
-	}
-
-	public String exportToJson() {
-		GsonBuilder builder = new GsonBuilder();
-		Gson gson = builder.create();
-		return gson.toJson(this);
-	}
-
-	public static Process importFromJson(String json) {
-		GsonBuilder builder = new GsonBuilder();
-		Gson gson = builder.create();
-		return gson.fromJson(json, Process.class);
 	}
 }

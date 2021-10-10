@@ -16,8 +16,7 @@ import dtu.dcr.engine.Process;
 public class VisualizerController {
 
 	@PostMapping("/dcr2graphviz")
-	public ResponseEntity<String> visualize(@RequestBody String json) {
-		Process p = Process.importFromJson(json);
+	public ResponseEntity<String> visualize(@RequestBody Process p) {
 		DcrModelView view = new DcrModelView(p.exportToBeamlineModel());
 		return ResponseEntity.ok(view.toString());
 	}

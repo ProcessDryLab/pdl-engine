@@ -18,7 +18,7 @@ public class DCRJsonRule {
 
 	public DCRJsonRule(Relation r) {
 		this.type = r.getRelation().name().toLowerCase();
-		this.source = r.getSource().getId();
-		this.target = r.getTarget().getId();
+		this.source = r.getSourceId();
+		this.target = r.getTargetId();
 	}
 }

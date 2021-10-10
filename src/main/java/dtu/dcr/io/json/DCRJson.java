@@ -9,7 +9,6 @@ import com.google.gson.GsonBuilder;
 import dtu.dcr.engine.Activity;
 import dtu.dcr.engine.Process;
 import dtu.dcr.engine.Relation;
-import dtu.dcr.engine.Relation.TYPES;
 import lombok.Getter;
 
 public class DCRJson {
@@ -43,12 +42,11 @@ public class DCRJson {
 
 		Process p = new Process();
 		for (DCRJsonEvent e : model.getEvents()) {
-			p.addActivity(e.getLabel());
+			Activity a = new Activity(e.getId(), e.getLabel());
+			p.addActivity(a);
 		}
 		for (DCRJsonRule r : model.getRules()) {
-			Activity source = p.getActivity(model.getEventFromId(r.getSource()).getActivity().getName());
-			Activity target = p.getActivity(model.getEventFromId(r.getTarget()).getActivity().getName());
-			p.addRelation(source, TYPES.valueOf(r.getType().toUpperCase()), target);
+			p.addRelation(r.getSource(), r.getType().toUpperCase(), r.getTarget());
 		}
 		return p;
 	}

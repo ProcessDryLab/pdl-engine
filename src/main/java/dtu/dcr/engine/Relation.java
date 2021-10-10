@@ -11,15 +11,19 @@ public class Relation {
 	}
 
 	@Getter
-	private Activity source;
+	private String sourceId;
 	@Getter
-	private Activity target;
+	private String targetId;
 	@Getter
 	private TYPES relation;
 
+	public Relation() {
+
+	}
+
 	public Relation(Activity source, TYPES relation, Activity target) {
-		this.source = source;
-		this.target = target;
+		this.sourceId = source.getId();
+		this.targetId = target.getId();
 		this.relation = relation;
 	}
 }

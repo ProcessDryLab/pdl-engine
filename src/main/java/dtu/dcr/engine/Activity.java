@@ -2,31 +2,44 @@ package dtu.dcr.engine;
 
 import java.util.UUID;
 
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
-@EqualsAndHashCode
 public class Activity {
 
 	@Getter
 	private String id;
 	@Getter
 	private String name;
-	@Getter
-	private String role;
 
-	public Activity(String name, String role) {
-		this.id = UUID.randomUUID().toString();
+	public Activity() {
+
+	}
+
+	public Activity(String id, String name) {
+		this.id = id;
 		this.name = name;
-		this.role = role;
 	}
 
 	public Activity(String name) {
-		this(name, null);
+		this.id = UUID.randomUUID().toString();
+		this.name = name;
 	}
 
 	@Override
 	public String toString() {
-		return name + " [" + role + "]";
+		return name;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Activity) {
+			return getId().equals(((Activity) obj).getId());
+		}
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return getId().hashCode();
 	}
 }

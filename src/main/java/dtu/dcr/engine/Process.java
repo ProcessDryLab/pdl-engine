@@ -1,7 +1,6 @@
 package dtu.dcr.engine;
 
 import java.util.HashSet;
-import java.util.Set;
 
 import org.apache.commons.lang3.tuple.Triple;
 
@@ -16,38 +15,21 @@ public class Process {
 
 	@Getter
 	private HashSet<Activity> activities = new HashSet<Activity>();
-	private HashSet<Activity> executedActivities = new HashSet<Activity>();
 	@Getter
 	private HashSet<Relation> relations = new HashSet<Relation>();
-	private HashSet<Activity> included = new HashSet<Activity>();
-	private HashSet<Activity> pending = new HashSet<Activity>();
 
 	public Activity addActivity(String activityName) {
-		Activity toRet = getActivity(activityName);
-		if (toRet == null) {
-			toRet = new Activity(activityName, null);
-			addActivity(toRet);
-		}
-		return toRet;
+		Activity a = new Activity(activityName);
+		addActivity(a);
+		return a;
 	}
 
-	public void addActivity(String activityName, boolean isPending) {
-		addActivity(new Activity(activityName, null), isPending);
-	}
-
-	public void addActivity(Activity act) {
-		addActivity(act, false);
-	}
-
-	public void addActivity(Activity act, boolean isPending) {
+	public Activity addActivity(Activity act) {
 		activities.add(act);
-		included.add(act);
-		if (isPending) {
-			pending.add(act);
-		}
+		return act;
 	}
 
-	public Activity getActivity(String activityName) {
+	public Activity getActivityFromName(String activityName) {
 		for (Activity a : activities) {
 			if (a.getName().equals(activityName)) {
 				return a;
@@ -56,73 +38,25 @@ public class Process {
 		return null;
 	}
 
-	public void addRelation(String source, String relation, String target) {
-		Activity srcActivity = addActivity(source);
-		Activity trtActivity = addActivity(target);
+	public Activity getActivityFromId(String activityId) {
+		for (Activity a : activities) {
+			if (a.getId().equals(activityId)) {
+				return a;
+			}
+		}
+		return null;
+	}
+
+	public void addRelation(String sourceId, String relation, String targetId) {
+		Activity srcActivity = getActivityFromId(sourceId);
+		Activity trtActivity = getActivityFromId(targetId);
 		TYPES relationType = TYPES.valueOf(relation);
 		addRelation(srcActivity, relationType, trtActivity);
 
 	}
 
 	public void addRelation(Activity source, Relation.TYPES arr, Activity target) {
-		addActivity(source);
-		addActivity(target);
 		relations.add(new Relation(source, arr, target));
-	}
-
-	public Set<Activity> getEnabledActivities() {
-		HashSet<Activity> result = new HashSet<Activity>(included);
-		for (Relation r : relations) {
-			switch (r.getRelation()) {
-			case CONDITION:
-				if ((included.contains(r.getSource()) && !executedActivities.contains(r.getSource()))) {
-					result.remove(r.getTarget());
-				}
-				break;
-			case MILESTONE:
-				if ((included.contains(r.getSource()) && pending.contains(r.getSource()))) {
-					result.remove(r.getTarget());
-				}
-				break;
-			default:
-				break;
-			}
-		}
-		return result;
-	}
-
-	public void execute(Activity e) {
-		pending.remove(e);
-		executedActivities.add(e);
-
-		for (Relation r : this.relations) {
-			if (!r.getSource().equals(e)) {
-				continue;
-			}
-
-			switch (r.getRelation()) {
-			case EXCLUDE:
-				included.remove(r.getTarget());
-				break;
-			case INCLUDE:
-				included.add(r.getTarget());
-				break;
-			case RESPONSE:
-				pending.add(r.getTarget());
-				break;
-			default:
-				break;
-			}
-		}
-	}
-
-	public boolean isAccepting() {
-		for (Activity a : pending) {
-			if (included.contains(a)) {
-				return false;
-			}
-		}
-		return true;
 	}
 
 	public DcrModel exportToBeamlineModel() {
@@ -131,7 +65,9 @@ public class Process {
 			m.addActivity(a.getName());
 		}
 		for (Relation r : relations) {
-			m.addRelation(Triple.of(r.getSource().getName(), r.getTarget().getName(),
+			Activity source = getActivityFromId(r.getSourceId());
+			Activity target = getActivityFromId(r.getTargetId());
+			m.addRelation(Triple.of(source.getName(), target.getName(),
 					DcrModel.RELATION.valueOf(r.getRelation().toString())));
 		}
 		return m;

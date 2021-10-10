@@ -2,7 +2,6 @@ package dtu.dcr.controllers;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
@@ -14,64 +13,46 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.google.gson.Gson;
-
-import dtu.dcr.engine.Activity;
 import dtu.dcr.engine.Process;
+import dtu.dcr.engine.Simulation;
+import dtu.dcr.engine.SimulationStatus;
 
 @RestController
 @RequestMapping("/api/v1/dcr/")
 @CrossOrigin
 public class EngineController {
 
-	private Map<String, Process> models = new HashMap<String, Process>();
+	private Map<String, Simulation> simulations = new HashMap<String, Simulation>();
 
 	@PostMapping("/simulation/initialize")
-	public ResponseEntity<String> initialize(@RequestBody String json) {
-		Process p = Process.importFromJson(json);
+	public ResponseEntity<String> initialize(@RequestBody Process p) {
 		String id = UUID.randomUUID().toString();
-		models.put(id, p);
+		Simulation s = new Simulation(id, p);
+		simulations.put(id, s);
 		return ResponseEntity.ok(id);
 	}
 
-	@SuppressWarnings("unchecked")
-	@GetMapping("/simulation/{id}/status")
-	public ResponseEntity<String> status(@PathVariable String id) {
-		if (models.containsKey(id)) {
-			Gson gson = new Gson();
-			return ResponseEntity.ok(gson.toJson(buildStatus(id)));
+	@GetMapping("/simulation/{simulationId}/status")
+	public ResponseEntity<SimulationStatus> status(@PathVariable String simulationId) {
+		if (simulations.containsKey(simulationId)) {
+			return ResponseEntity.ok(simulations.get(simulationId).buildStatus());
 		}
-		return (ResponseEntity<String>) ResponseEntity.notFound();
+		return ResponseEntity.notFound().build();
 	}
 
 	@GetMapping("/simulation/{id}/reset")
 	public ResponseEntity<String> reset(@PathVariable String id) {
-		models.remove(id);
-		return ResponseEntity.ok("ack");
+		Process p = simulations.get(id).getProcess();
+		return initialize(p);
 	}
 
-	@SuppressWarnings("unchecked")
-	@GetMapping("/simulation/{id}/execute/{activity}")
-	public ResponseEntity<String> status(@PathVariable String id, @PathVariable String activity) {
-		if (models.containsKey(id)) {
-			Process p = models.get(id);
-			p.execute(p.getActivity(activity));
-			Gson gson = new Gson();
-			return ResponseEntity.ok(gson.toJson(buildStatus(id)));
+	@GetMapping("/simulation/{simulationId}/execute/{activityId}")
+	public ResponseEntity<SimulationStatus> status(@PathVariable String simulationId, @PathVariable String activityId) {
+		if (simulations.containsKey(simulationId)) {
+			Simulation s = simulations.get(simulationId);
+			s.execute(activityId);
+			return ResponseEntity.ok(s.buildStatus());
 		}
-		return (ResponseEntity<String>) ResponseEntity.notFound();
+		return ResponseEntity.notFound().build();
 	}
-
-	public SimulationStatus buildStatus(String id) {
-		Process p = models.get(id);
-		SimulationStatus toSerialize = new SimulationStatus();
-		toSerialize.enabledActivities = p.getEnabledActivities();
-		toSerialize.isAccepting = p.isAccepting();
-		return toSerialize;
-	}
-}
-
-class SimulationStatus {
-	public Set<Activity> enabledActivities;
-	public boolean isAccepting;
 }

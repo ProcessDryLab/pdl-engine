@@ -80,6 +80,7 @@ public class Simulation {
 	public SimulationStatus buildStatus() {
 		SimulationStatus toSerialize = new SimulationStatus();
 		toSerialize.setEnabledActivities(getEnabledActivities());
+		toSerialize.setPendingActivities(pending);
 		toSerialize.setAccepting(isAccepting());
 		return toSerialize;
 	}

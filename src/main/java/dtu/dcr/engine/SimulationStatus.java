@@ -15,5 +15,8 @@ public class SimulationStatus {
 	@Getter
 	@Setter
 	private boolean isAccepting;
+	@Getter
+	@Setter
+	private Set<String> pendingActivities;
 
 }
